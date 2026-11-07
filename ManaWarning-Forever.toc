@@ -1,0 +1,10 @@
+## Title: ManaWarning-Forever
+## Version: 0.2
+## Author: Partouf
+## Interface: 16001
+## AllowLoadGameType: camelot
+## SavedVariablesPerCharacter: ManaWarning_Forever_Settings
+## X-eMail: partouf@gmail.com
+
+ManaWarning-Forever.xml
+ManaWarning-Forever.lua

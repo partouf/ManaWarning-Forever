@@ -1,0 +1,3 @@
+# SavedVariables cache files (not shipped with the addon)
+*.lua.bak
+

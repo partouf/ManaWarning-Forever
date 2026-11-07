@@ -1,0 +1,101 @@
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="ManaWarning-Forever.lua" />
+
+    <!-- Invisible event-only frame -->
+    <Frame name="ManaWarningForeverFrame" parent="UIParent" hidden="false">
+        <Scripts>
+            <OnLoad>ManaWarningForever_OnLoad(self);</OnLoad>
+            <OnEvent>ManaWarningForever_OnEvent(self, event, ...);</OnEvent>
+        </Scripts>
+    </Frame>
+
+    <!-- Settings window (toggled by /mwf) -->
+    <Frame name="ManaWarningForeverSettings" parent="UIParent" inherits="BackdropTemplate" hidden="true" toplevel="true" movable="true" enableMouse="true">
+        <Size><AbsDimension x="420" y="380" /></Size>
+        <Anchors><Anchor point="CENTER" /></Anchors>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="MWFTitle" inherits="GameFontNormalLarge" text="ManaWarning-Forever">
+                    <Anchors><Anchor point="TOP"><Offset x="0" y="-18" /></Anchor></Anchors>
+                </FontString>
+                <FontString name="MWFWarnTextLabel" inherits="GameFontNormal" text="Warning text:">
+                    <Size><AbsDimension x="160" y="20" /></Size>
+                    <Anchors><Anchor point="TOPLEFT"><Offset x="20" y="-82" /></Anchor></Anchors>
+                    <Color r="1" g="1" b="1" />
+                </FontString>
+                <FontString name="MWFCooldownLabel" inherits="GameFontNormal" text="Rewarn cooldown (s):">
+                    <Size><AbsDimension x="160" y="20" /></Size>
+                    <Anchors><Anchor point="TOPLEFT"><Offset x="20" y="-114" /></Anchor></Anchors>
+                    <Color r="1" g="1" b="1" />
+                </FontString>
+                <FontString name="MWFFloodLabel" inherits="GameFontNormal" text="Max warnings per combat:">
+                    <Size><AbsDimension x="160" y="20" /></Size>
+                    <Anchors><Anchor point="TOPLEFT"><Offset x="20" y="-146" /></Anchor></Anchors>
+                    <Color r="1" g="1" b="1" />
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <CheckButton name="MWFEnable" inherits="UICheckButtonTemplate">
+                <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-46" /></Anchor></Anchors>
+            </CheckButton>
+            <EditBox name="MWFWarnText" inherits="InputBoxTemplate" autoFocus="false">
+                <Size><AbsDimension x="200" y="20" /></Size>
+                <Anchors><Anchor point="TOPLEFT"><Offset x="200" y="-78" /></Anchor></Anchors>
+            </EditBox>
+            <EditBox name="MWFCooldown" inherits="InputBoxTemplate" autoFocus="false" numeric="true">
+                <Size><AbsDimension x="60" y="20" /></Size>
+                <Anchors><Anchor point="TOPLEFT"><Offset x="200" y="-110" /></Anchor></Anchors>
+            </EditBox>
+            <EditBox name="MWFFlood" inherits="InputBoxTemplate" autoFocus="false" numeric="true">
+                <Size><AbsDimension x="60" y="20" /></Size>
+                <Anchors><Anchor point="TOPLEFT"><Offset x="200" y="-142" /></Anchor></Anchors>
+            </EditBox>
+            <CheckButton name="MWFCombatOnly" inherits="UICheckButtonTemplate">
+                <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-176" /></Anchor></Anchors>
+            </CheckButton>
+            <CheckButton name="MWFRaidOnly" inherits="UICheckButtonTemplate">
+                <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-202" /></Anchor></Anchors>
+            </CheckButton>
+            <CheckButton name="MWFAnnParty" inherits="UICheckButtonTemplate">
+                <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-234" /></Anchor></Anchors>
+            </CheckButton>
+            <CheckButton name="MWFAnnRaid" inherits="UICheckButtonTemplate">
+                <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-260" /></Anchor></Anchors>
+            </CheckButton>
+            <CheckButton name="MWFAnnInstance" inherits="UICheckButtonTemplate">
+                <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-286" /></Anchor></Anchors>
+            </CheckButton>
+            <Button name="MWFBtnDefaults" inherits="UIPanelButtonTemplate" text="Defaults">
+                <Size><AbsDimension x="90" y="22" /></Size>
+                <Anchors><Anchor point="BOTTOMLEFT"><Offset x="10" y="10" /></Anchor></Anchors>
+                <Scripts><OnClick>MWF_UI_OnDefaults();</OnClick></Scripts>
+            </Button>
+            <Button name="MWFBtnCancel" inherits="UIPanelButtonTemplate" text="Cancel">
+                <Size><AbsDimension x="90" y="22" /></Size>
+                <Anchors><Anchor point="BOTTOMRIGHT"><Offset x="-110" y="10" /></Anchor></Anchors>
+                <Scripts><OnClick>MWF_UI_OnCancel();</OnClick></Scripts>
+            </Button>
+            <Button name="MWFBtnSave" inherits="UIPanelButtonTemplate" text="Save">
+                <Size><AbsDimension x="90" y="22" /></Size>
+                <Anchors><Anchor point="BOTTOMRIGHT"><Offset x="-10" y="10" /></Anchor></Anchors>
+                <Scripts><OnClick>MWF_UI_OnSave();</OnClick></Scripts>
+            </Button>
+        </Frames>
+        <Scripts>
+            <OnLoad>
+                if self.SetBackdrop then
+                    self:SetBackdrop({
+                        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+                        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+                        tile = true, tileEdge = true, tileSize = 32, edgeSize = 32,
+                        insets = { left = 11, right = 12, top = 12, bottom = 11 },
+                    });
+                end
+                self:RegisterForDrag("LeftButton");
+            </OnLoad>
+            <OnDragStart>self:StartMoving();</OnDragStart>
+            <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
+        </Scripts>
+    </Frame>
+</Ui>
