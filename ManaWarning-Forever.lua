@@ -20,6 +20,7 @@ local DEFAULTS = {
     maxPerCombat    = 3,    -- flood protection
     combatOnly      = false,
     raidOnly        = false,
+    announceSay     = false,
     announceParty   = false,
     announceRaid    = false,
     announceInstance= false,
@@ -107,6 +108,9 @@ local function dispatchWarning()
     -- Always show to self
     msg(S.warningText, 1.0, 0.2, 0.2)
 
+    -- SAY is always broadcastable (works even solo in the world)
+    if S.announceSay then sendChat('SAY', S.warningText) end
+
     -- Group announces (prefer raid > instance > party, mirroring MW-Classic)
     local inInstance = IsInGroup and LE_PARTY_CATEGORY_INSTANCE and IsInGroup(LE_PARTY_CATEGORY_INSTANCE)
     local inParty = IsInGroup and IsInGroup()
@@ -139,6 +143,7 @@ local function refreshUI()
     setLabel(MWFEnable,      'Enable OOM warning')
     setLabel(MWFCombatOnly,  'Only when in combat')
     setLabel(MWFRaidOnly,    'Only when in raid')
+    setLabel(MWFAnnSay,      'Announce to /say')
     setLabel(MWFAnnParty,    'Announce to party')
     setLabel(MWFAnnRaid,     'Announce to raid')
     setLabel(MWFAnnInstance, 'Announce to instance')
@@ -149,6 +154,7 @@ local function refreshUI()
     MWFFlood:SetNumber(S.maxPerCombat or 3)
     MWFCombatOnly:SetChecked(S.combatOnly)
     MWFRaidOnly:SetChecked(S.raidOnly)
+    MWFAnnSay:SetChecked(S.announceSay)
     MWFAnnParty:SetChecked(S.announceParty)
     MWFAnnRaid:SetChecked(S.announceRaid)
     MWFAnnInstance:SetChecked(S.announceInstance)
@@ -161,6 +167,7 @@ function MWF_UI_OnSave()
     S.maxPerCombat     = tonumber(MWFFlood:GetText()) or DEFAULTS.maxPerCombat
     S.combatOnly       = MWFCombatOnly:GetChecked() and true or false
     S.raidOnly         = MWFRaidOnly:GetChecked() and true or false
+    S.announceSay      = MWFAnnSay:GetChecked() and true or false
     S.announceParty    = MWFAnnParty:GetChecked() and true or false
     S.announceRaid     = MWFAnnRaid:GetChecked() and true or false
     S.announceInstance = MWFAnnInstance:GetChecked() and true or false

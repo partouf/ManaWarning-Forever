@@ -57,14 +57,17 @@
             <CheckButton name="MWFRaidOnly" inherits="UICheckButtonTemplate">
                 <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-202" /></Anchor></Anchors>
             </CheckButton>
-            <CheckButton name="MWFAnnParty" inherits="UICheckButtonTemplate">
+            <CheckButton name="MWFAnnSay" inherits="UICheckButtonTemplate">
                 <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-234" /></Anchor></Anchors>
             </CheckButton>
-            <CheckButton name="MWFAnnRaid" inherits="UICheckButtonTemplate">
+            <CheckButton name="MWFAnnParty" inherits="UICheckButtonTemplate">
                 <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-260" /></Anchor></Anchors>
             </CheckButton>
-            <CheckButton name="MWFAnnInstance" inherits="UICheckButtonTemplate">
+            <CheckButton name="MWFAnnRaid" inherits="UICheckButtonTemplate">
                 <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-286" /></Anchor></Anchors>
+            </CheckButton>
+            <CheckButton name="MWFAnnInstance" inherits="UICheckButtonTemplate">
+                <Anchors><Anchor point="TOPLEFT"><Offset x="16" y="-312" /></Anchor></Anchors>
             </CheckButton>
             <Button name="MWFBtnDefaults" inherits="UIPanelButtonTemplate" text="Defaults">
                 <Size><AbsDimension x="90" y="22" /></Size>
