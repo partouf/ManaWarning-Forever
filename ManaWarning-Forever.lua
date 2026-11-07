@@ -20,7 +20,6 @@ local DEFAULTS = {
     maxPerCombat    = 3,    -- flood protection
     combatOnly      = false,
     raidOnly        = false,
-    announceSay     = false,
     announceParty   = false,
     announceRaid    = false,
     announceInstance= false,
@@ -80,12 +79,21 @@ end
 --------------------------------------------------------------------------
 
 local function sendChat(channel, text)
-    if type(SendChatMessage) == 'function' then
+    if type(SendChatMessage) ~= 'function' then return end
+    -- Defer so the send happens in a fresh frame tick, outside any protected
+    -- call chain triggered by the Blizzard event that started this dispatch.
+    -- Calling inline from UI_ERROR_MESSAGE causes "Interface action failed
+    -- because of an AddOn" since SendChatMessage is restricted from a tainted
+    -- stack.
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, function() pcall(SendChatMessage, text, channel) end)
+    else
         pcall(SendChatMessage, text, channel)
     end
 end
 
 local function dispatchWarning()
+    if not S then loadSettings() end
     local now = GetTime()
     if now - lastWarnTime < S.rewarnCooldown then return end
 
@@ -108,10 +116,8 @@ local function dispatchWarning()
     -- Always show to self
     msg(S.warningText, 1.0, 0.2, 0.2)
 
-    -- SAY is always broadcastable (works even solo in the world)
-    if S.announceSay then sendChat('SAY', S.warningText) end
-
     -- Group announces (prefer raid > instance > party, mirroring MW-Classic)
+    -- SAY and YELL are blocked from addon code on Forever (anti-spam), so no option for those.
     local inInstance = IsInGroup and LE_PARTY_CATEGORY_INSTANCE and IsInGroup(LE_PARTY_CATEGORY_INSTANCE)
     local inParty = IsInGroup and IsInGroup()
 
@@ -143,7 +149,6 @@ local function refreshUI()
     setLabel(MWFEnable,      'Enable OOM warning')
     setLabel(MWFCombatOnly,  'Only when in combat')
     setLabel(MWFRaidOnly,    'Only when in raid')
-    setLabel(MWFAnnSay,      'Announce to /say')
     setLabel(MWFAnnParty,    'Announce to party')
     setLabel(MWFAnnRaid,     'Announce to raid')
     setLabel(MWFAnnInstance, 'Announce to instance')
@@ -154,20 +159,19 @@ local function refreshUI()
     MWFFlood:SetNumber(S.maxPerCombat or 3)
     MWFCombatOnly:SetChecked(S.combatOnly)
     MWFRaidOnly:SetChecked(S.raidOnly)
-    MWFAnnSay:SetChecked(S.announceSay)
     MWFAnnParty:SetChecked(S.announceParty)
     MWFAnnRaid:SetChecked(S.announceRaid)
     MWFAnnInstance:SetChecked(S.announceInstance)
 end
 
 function MWF_UI_OnSave()
+    if not S then loadSettings() end
     S.enabled          = MWFEnable:GetChecked() and true or false
     S.warningText      = MWFWarnText:GetText() or DEFAULTS.warningText
     S.rewarnCooldown   = tonumber(MWFCooldown:GetText()) or DEFAULTS.rewarnCooldown
     S.maxPerCombat     = tonumber(MWFFlood:GetText()) or DEFAULTS.maxPerCombat
     S.combatOnly       = MWFCombatOnly:GetChecked() and true or false
     S.raidOnly         = MWFRaidOnly:GetChecked() and true or false
-    S.announceSay      = MWFAnnSay:GetChecked() and true or false
     S.announceParty    = MWFAnnParty:GetChecked() and true or false
     S.announceRaid     = MWFAnnRaid:GetChecked() and true or false
     S.announceInstance = MWFAnnInstance:GetChecked() and true or false
@@ -179,6 +183,7 @@ function MWF_UI_OnCancel()
 end
 
 function MWF_UI_OnDefaults()
+    if not S then loadSettings() end
     for k, v in pairs(DEFAULTS) do S[k] = v end
     refreshUI()
 end
@@ -241,6 +246,7 @@ function ManaWarningForever_OnEvent(obj, event, ...)
         return
     end
 
+    if not S then loadSettings() end
     if not S or not S.enabled then return end
 
     if event == 'UI_ERROR_MESSAGE' or event == 'UI_INFO_MESSAGE' then
