@@ -134,6 +134,8 @@ local function setLabel(checkbox, text)
 end
 
 local function refreshUI()
+    if not S then loadSettings() end
+    if not S then return end
     setLabel(MWFEnable,      'Enable OOM warning')
     setLabel(MWFCombatOnly,  'Only when in combat')
     setLabel(MWFRaidOnly,    'Only when in raid')
@@ -179,6 +181,7 @@ end
 --------------------------------------------------------------------------
 
 function ManaWarningForever_OnLoad(obj)
+    obj:RegisterEvent('ADDON_LOADED')
     obj:RegisterEvent('PLAYER_LOGIN')
     obj:RegisterEvent('PLAYER_REGEN_ENABLED')  -- left combat
     local function safeReg(ev) pcall(function() obj:RegisterEvent(ev) end) end
@@ -208,15 +211,21 @@ function ManaWarningForever_OnLoad(obj)
 end
 
 function ManaWarningForever_OnEvent(obj, event, ...)
-    if event == 'PLAYER_LOGIN' then
-        loadSettings()
-        local _, enClass = tryCall(UnitClass, 'player')
-        local _, powerType = tryCall(UnitPowerType, 'player')
-        -- Silently disable if not a mana user
-        if type(powerType) == 'number' and powerType ~= 0 then
-            S.enabled = false
+    if event == 'ADDON_LOADED' then
+        local arg1 = ...
+        if arg1 == 'ManaWarning-Forever' then
+            loadSettings()
+            local _, enClass = tryCall(UnitClass, 'player')
+            local _, powerType = tryCall(UnitPowerType, 'player')
+            if type(powerType) == 'number' and powerType ~= 0 then
+                S.enabled = false
+            end
+            msg('ManaWarning-Forever loaded (class=' .. tostring(enClass) .. '). Type /mwf for settings.', 0.4, 1.0, 1.0)
         end
-        msg('ManaWarning-Forever loaded (class=' .. tostring(enClass) .. '). Type /mwf for settings.', 0.4, 1.0, 1.0)
+        return
+    end
+    if event == 'PLAYER_LOGIN' then
+        if not S then loadSettings() end  -- belt-and-suspenders
         return
     end
 
